@@ -1,7 +1,7 @@
 import copy
 from typing import Type
 
-from pyjo import Field, ModelMetaclass, ListField
+from pyjo import Field, ModelMetaclass, ListField, MapField
 from six import iteritems
 
 from pyjo_mdl.helpers import number_validator, cast_bool, string_validator, url_validator, embedded_validator, cast_int, \
@@ -45,6 +45,14 @@ BASE_FIELD_PROPERTIES = {
     'array': {
         'type': None,
         'field': ListField,
+        'field_kwargs': {
+            'inner_field': lambda fs, *args, **kwargs: field_from_structure(fs['element'], *args, **kwargs),
+        },
+        'model_validator': None,
+    },
+    'map': {
+        'type': None,
+        'field': MapField,
         'field_kwargs': {
             'inner_field': lambda fs, *args, **kwargs: field_from_structure(fs['element'], *args, **kwargs),
         },

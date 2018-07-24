@@ -194,3 +194,45 @@ def test_embedded():
         Model(embeddato=dict(numero=11))
 
     assert str(err.value) == 'Value is bigger than max value: 11 > 5'
+
+
+def test_map_string():
+    Model = pyjo_model_from_structure({
+        'map_value': {
+            'type': 'map',
+            'element': {
+                'type': 'string'
+            }
+        }
+    })
+
+    with pytest.raises(FieldTypeError) as err:
+        Model(map_value='asd')
+    assert str(err.value) == "map_value value is not of type dict, given \"asd\""
+
+    instance = Model(map_value={"key1": "value1", "key2": "value2"})
+    assert instance.map_value == {"key1": "value1", "key2": "value2"}
+    assert instance.to_dict() == {'map_value': {"key1": "value1", "key2": "value2"}}
+
+
+def test_map_integer():
+    Model = pyjo_model_from_structure({
+        'map_value': {
+            'type': 'map',
+            'element': {
+                'type': 'integer'
+            }
+        }
+    })
+
+    with pytest.raises(FieldTypeError) as err:
+        Model(map_value='asd')
+    assert str(err.value) == "map_value value is not of type dict, given \"asd\""
+
+    with pytest.raises(ValueError) as err:
+        Model(map_value={"key1": "a"})
+    assert str(err.value) == "invalid literal for int() with base 10: 'a'"
+
+    instance = Model(map_value={"key1": 1, "key2": "2"})
+    assert instance.map_value == {"key1": 1, "key2": 2}
+    assert instance.to_dict() == {'map_value': {"key1": 1, "key2": 2}}
